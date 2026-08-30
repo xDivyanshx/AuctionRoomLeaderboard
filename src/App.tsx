@@ -53,7 +53,7 @@ function App() {
               <tbody>
                 {standings.map((row, index) => {
                   const diff = row.pointsFor - row.pointsAgainst;
-                  return <tr key={row.player} className={index < 2 ? "top-two" : ""}>
+                  return <tr key={row.player}>
                     <td><span className="position">{index + 1}</span></td>
                     <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><strong>{players[row.player].name}</strong></div></td>
                     <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
@@ -66,7 +66,7 @@ function App() {
               </tbody>
             </table>
           </div>
-          <div className="table-key"><span><i className="champion-key" /> Top two</span><span>Pts = H2H points + median bonus</span></div>
+          <div className="table-key"><span>Pts = H2H points + median bonus</span></div>
         </section>
 
         <section className="gameweek-section">

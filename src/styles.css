@@ -28,7 +28,6 @@ th { height: 44px; padding: 0 13px; background: #eef1ed; color: #68736d; font-si
 th:nth-child(2), td:nth-child(2) { text-align: left; }
 td { height: 67px; padding: 0 13px; border-top: 1px solid #e9ece8; text-align: center; font-size: 13px; color: #526059; }
 tbody tr { position: relative; }
-tbody tr.top-two td:first-child { box-shadow: inset 3px 0 #b8d52b; }
 .position { font-weight: 700; color: #27342e; }
 .manager { display: flex; align-items: center; gap: 11px; min-width: 130px; }
 .manager strong { color: #1c2923; font-size: 14px; }
@@ -43,7 +42,7 @@ tbody tr.top-two td:first-child { box-shadow: inset 3px 0 #b8d52b; }
 .tooltip { position: absolute; z-index: 5; bottom: 22px; left: 50%; transform: translateX(-50%); width: 190px; padding: 8px; background: #10231b; color: white; font-size: 10px; line-height: 1.35; text-transform: none; letter-spacing: 0; border-radius: 4px; opacity: 0; pointer-events: none; }
 .tooltip-label:hover .tooltip { opacity: 1; }
 .table-key { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 9px 16px; border-top: 1px solid #e2e6e1; color: #7a847f; font-size: 11px; }
-.table-key span { display: flex; align-items: center; gap: 7px; }.champion-key { width: 3px; height: 14px; background: #b8d52b; display: inline-block; }
+.table-key span { display: flex; align-items: center; gap: 7px; }
 .gameweek-section { margin-top: 58px; }
 .section-title-row { margin-bottom: 22px; }
 .week-nav { display: flex; height: 38px; }
