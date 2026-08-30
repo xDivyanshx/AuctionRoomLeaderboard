@@ -12,6 +12,11 @@ const name = (id: OpponentId) => id === "average" ? "League Average" : players[i
 function App() {
   const completedWeeks = results.filter((result) => playerIds.every((id) => result.scores[id] !== undefined));
   const latestWeek = completedWeeks.at(-1)?.gameweek ?? 1;
+  const lastUpdated = new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date(__BUILD_TIME__));
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
   const standings = useMemo(() => buildStandings(results), []);
   const selectedResult = results.find((result) => result.gameweek === selectedWeek);
@@ -95,7 +100,10 @@ function App() {
         </section>
       </main>
 
-      <footer><span>Auction Room Fantasy League</span><span>Updated through GW {latestWeek}</span></footer>
+      <footer>
+        <span>Auction Room Fantasy League</span>
+        <span>{completedWeeks.length ? `Updated through GW ${latestWeek}` : "No results yet"} · Last updated {lastUpdated} IST</span>
+      </footer>
     </div>
   );
 }

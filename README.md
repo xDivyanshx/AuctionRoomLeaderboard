@@ -8,7 +8,8 @@ A static fantasy league leaderboard for Divyansh, Ishaan, Avneesh, Akshat, and V
 - Exact 2026/27 fixture schedule imported for all 38 gameweeks.
 - Head-to-head, average matchup, median bonus, score difference, and form calculations implemented.
 - Cloudflare Workers static-assets deployment configured through `wrangler.jsonc`.
-- GW1 currently contains sample scores and is waiting for the real results.
+- All 38 gameweeks are prefilled in `src/data/results.json` and are waiting for real results.
+- The footer automatically displays the latest deployment time in IST.
 
 ## League rules
 
@@ -20,9 +21,22 @@ A static fantasy league leaderboard for Divyansh, Ishaan, Avneesh, Akshat, and V
 
 ## Update weekly scores
 
-Edit `src/data/results.ts` and add one entry containing all five scores. The app calculates head-to-head results, the average matchup, weekly median bonuses, score difference, form, and standings.
+Edit only `src/data/results.json`. Find the required gameweek and replace its five `null` values with the real scores:
 
-Before the first real deployment, replace the sample GW1 entry rather than appending a second GW1 entry.
+```json
+{
+  "gameweek": 1,
+  "scores": {
+    "divyansh": 72,
+    "ishaan": 68,
+    "avneesh": 55,
+    "akshat": 55,
+    "viren": 61
+  }
+}
+```
+
+Do not enter `0` for an unplayed week. Zero is treated as a real score; `null` means not played. A gameweek is included only when all five values are filled.
 
 ## Run locally
 

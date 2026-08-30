@@ -9,8 +9,9 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 - React, TypeScript, and Vite application is implemented.
 - Exact fixtures from `EPL_H2H_Fixtures_2026_27.pdf` have been transcribed into `src/data/fixtures.ts`.
 - The source PDF was intentionally removed after verification to keep the repository clean.
-- `src/data/results.ts` still contains sample GW1 scores. Replace them when the owner supplies real results.
+- `src/data/results.json` contains all 38 gameweeks prefilled with `null` scores.
 - Cloudflare deployment is configured in `wrangler.jsonc`.
+- The footer timestamp is injected at build time through `__BUILD_TIME__` in `vite.config.ts` and displayed in IST.
 
 ## Competition rules
 
@@ -25,7 +26,8 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 ## Important files
 
 - `src/data/fixtures.ts`: exact 38-gameweek schedule.
-- `src/data/results.ts`: only file normally edited after each gameweek.
+- `src/data/results.json`: only file normally edited after each gameweek.
+- `src/data/results.ts`: adapter that converts JSON `null` values into incomplete scores for the app.
 - `src/lib/standings.ts`: scoring and ranking logic.
 - `src/App.tsx`: leaderboard and gameweek UI.
 - `wrangler.jsonc`: Cloudflare static-assets deployment.
@@ -43,4 +45,4 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 
 ## Next action
 
-Wait for the owner to provide the five real GW1 fantasy scores. Replace the sample values in `src/data/results.ts`, verify the calculated GW1 match results and median bonuses, build, update milestone notes, and stage the changes for owner review.
+Wait for the owner to provide the five real GW1 fantasy scores. Replace the five GW1 `null` values in `src/data/results.json`, verify the calculated match results and median bonuses, build, update milestone notes, and stage the changes for owner review.
