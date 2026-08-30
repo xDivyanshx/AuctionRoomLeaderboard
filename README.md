@@ -19,4 +19,4 @@ npm run dev
 - Build output directory: `dist`
 - Node version: `22`
 
-The included fixture cycle is a placeholder. Replace the five rounds in `src/data/fixtures.ts` with the agreed schedule before publishing real results.
+The full 2026/27 fixture schedule is stored in `src/data/fixtures.ts`.

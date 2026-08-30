@@ -1,35 +1,57 @@
-import type { Fixture, GameweekFixture } from "../types";
+import type { GameweekFixture, PlayerId } from "../types";
 
-// Replace these five rounds with your real schedule if its cycle differs.
-const cycle: Fixture[][] = [
-  [
-    { home: "divyansh", away: "ishaan" },
-    { home: "avneesh", away: "akshat" },
-    { home: "viren", away: "average" },
+const fixture = (
+  gameweek: number,
+  first: [PlayerId, PlayerId],
+  second: [PlayerId, PlayerId],
+  average: PlayerId,
+): GameweekFixture => ({
+  gameweek,
+  matches: [
+    { home: first[0], away: first[1] },
+    { home: second[0], away: second[1] },
+    { home: average, away: "average" },
   ],
-  [
-    { home: "divyansh", away: "avneesh" },
-    { home: "akshat", away: "viren" },
-    { home: "ishaan", away: "average" },
-  ],
-  [
-    { home: "divyansh", away: "akshat" },
-    { home: "ishaan", away: "viren" },
-    { home: "avneesh", away: "average" },
-  ],
-  [
-    { home: "divyansh", away: "viren" },
-    { home: "ishaan", away: "avneesh" },
-    { home: "akshat", away: "average" },
-  ],
-  [
-    { home: "ishaan", away: "akshat" },
-    { home: "avneesh", away: "viren" },
-    { home: "divyansh", away: "average" },
-  ],
+});
+
+// Source: EPL_H2H_Fixtures_2026_27.pdf
+export const fixtures: GameweekFixture[] = [
+  fixture(1, ["akshat", "ishaan"], ["divyansh", "avneesh"], "viren"),
+  fixture(2, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(3, ["viren", "akshat"], ["ishaan", "divyansh"], "avneesh"),
+  fixture(4, ["ishaan", "viren"], ["avneesh", "akshat"], "divyansh"),
+  fixture(5, ["avneesh", "ishaan"], ["divyansh", "viren"], "akshat"),
+  fixture(6, ["divyansh", "avneesh"], ["akshat", "ishaan"], "viren"),
+  fixture(7, ["viren", "avneesh"], ["akshat", "divyansh"], "ishaan"),
+  fixture(8, ["ishaan", "divyansh"], ["viren", "akshat"], "avneesh"),
+  fixture(9, ["ishaan", "viren"], ["avneesh", "akshat"], "divyansh"),
+  fixture(10, ["avneesh", "ishaan"], ["divyansh", "viren"], "akshat"),
+  fixture(11, ["akshat", "ishaan"], ["divyansh", "avneesh"], "viren"),
+  fixture(12, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(13, ["viren", "akshat"], ["ishaan", "divyansh"], "avneesh"),
+  fixture(14, ["ishaan", "viren"], ["avneesh", "akshat"], "divyansh"),
+  fixture(15, ["avneesh", "ishaan"], ["divyansh", "viren"], "akshat"),
+  fixture(16, ["divyansh", "avneesh"], ["akshat", "ishaan"], "viren"),
+  fixture(17, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(18, ["ishaan", "divyansh"], ["viren", "akshat"], "avneesh"),
+  fixture(19, ["avneesh", "akshat"], ["ishaan", "viren"], "divyansh"),
+  fixture(20, ["avneesh", "ishaan"], ["divyansh", "viren"], "akshat"),
+  fixture(21, ["akshat", "ishaan"], ["divyansh", "avneesh"], "viren"),
+  fixture(22, ["viren", "avneesh"], ["akshat", "divyansh"], "ishaan"),
+  fixture(23, ["viren", "akshat"], ["ishaan", "divyansh"], "avneesh"),
+  fixture(24, ["avneesh", "akshat"], ["ishaan", "viren"], "divyansh"),
+  fixture(25, ["avneesh", "ishaan"], ["divyansh", "viren"], "akshat"),
+  fixture(26, ["akshat", "ishaan"], ["divyansh", "avneesh"], "viren"),
+  fixture(27, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(28, ["ishaan", "divyansh"], ["viren", "akshat"], "avneesh"),
+  fixture(29, ["ishaan", "viren"], ["avneesh", "akshat"], "divyansh"),
+  fixture(30, ["divyansh", "viren"], ["avneesh", "ishaan"], "akshat"),
+  fixture(31, ["akshat", "ishaan"], ["divyansh", "avneesh"], "viren"),
+  fixture(32, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(33, ["ishaan", "divyansh"], ["viren", "akshat"], "avneesh"),
+  fixture(34, ["avneesh", "akshat"], ["ishaan", "viren"], "divyansh"),
+  fixture(35, ["divyansh", "viren"], ["avneesh", "ishaan"], "akshat"),
+  fixture(36, ["divyansh", "avneesh"], ["akshat", "ishaan"], "viren"),
+  fixture(37, ["akshat", "divyansh"], ["viren", "avneesh"], "ishaan"),
+  fixture(38, ["viren", "akshat"], ["ishaan", "divyansh"], "avneesh"),
 ];
-
-export const fixtures: GameweekFixture[] = Array.from({ length: 38 }, (_, index) => ({
-  gameweek: index + 1,
-  matches: cycle[index % cycle.length],
-}));
