@@ -55,7 +55,8 @@ tbody tr { position: relative; }
 .record { min-height: 126px; padding: 18px; border-right: 1px solid #e2e6e1; border-bottom: 1px solid #e2e6e1; }
 .record:nth-child(3n) { border-right: 0; }.record:nth-last-child(-n + 3) { border-bottom: 0; }
 .record span, .record small { display: block; }.record span { color: #7a847f; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; }
-.record strong { display: block; margin: 9px 0 4px; color: #10231b; font-family: Manrope, sans-serif; font-size: 17px; line-height: 1.25; }
+.record ol { margin: 9px 0 0; padding-left: 22px; color: #7a847f; font-size: 11px; line-height: 1.8; }
+.record li b { color: #526059; font-weight: 600; }.record li.record-winner b { color: #10231b; font-family: Manrope, sans-serif; font-size: 16px; line-height: 1.25; }
 .record small { color: #68736d; font-size: 11px; }
 .journey-section { margin-top: 58px; }
 .back-button { border: 1px solid #cfd5cf; border-radius: 5px; background: white; color: #26342d; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }

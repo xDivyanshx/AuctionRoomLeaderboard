@@ -34,29 +34,29 @@ function getSeasonRecords(completedWeeks: typeof results) {
     rivalries.set(key, rivalry);
   });
 
-  const bestRecord = [...records.entries()].filter(([, record]) => record.won + record.drawn + record.lost > 0).sort((a, b) => {
+  const rankedRecords = [...records.entries()].filter(([, record]) => record.won + record.drawn + record.lost > 0).sort((a, b) => {
     const aPlayed = a[1].won + a[1].drawn + a[1].lost;
     const bPlayed = b[1].won + b[1].drawn + b[1].lost;
     return (b[1].won * 3 + b[1].drawn) / bPlayed - (a[1].won * 3 + a[1].drawn) / aPlayed || b[1].won - a[1].won;
-  })[0];
-  const balanced = [...rivalries.values()].sort((a, b) => Math.abs(a.wins[0] - a.wins[1]) - Math.abs(b.wins[0] - b.wins[1]) || a.margin - b.margin)[0];
+  });
+  const rankedRivalries = [...rivalries.values()].sort((a, b) => Math.abs(a.wins[0] - a.wins[1]) - Math.abs(b.wins[0] - b.wins[1]) || a.margin - b.margin);
   const weeklyScores = completedWeeks.flatMap((result) => playerIds.map((player) => ({ player, gameweek: result.gameweek, score: result.scores[player]! })));
-  const highest = [...weeklyScores].sort((a, b) => b.score - a.score)[0];
-  const consistent = playerIds.map((player) => {
+  const highestScores = [...weeklyScores].sort((a, b) => b.score - a.score);
+  const consistency = playerIds.map((player) => {
     const scores = completedWeeks.map((week) => week.scores[player]!);
     const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
     const deviation = Math.sqrt(scores.reduce((sum, score) => sum + (score - average) ** 2, 0) / scores.length);
     return { player, deviation };
-  }).sort((a, b) => a.deviation - b.deviation)[0];
-  const matchLabel = (match?: typeof directMatches[number]) => match ? `${players[match.homeScore! > match.awayScore! ? match.home : match.away].name} by ${number(match.margin)}` : "Awaiting a win";
+  }).sort((a, b) => a.deviation - b.deviation);
+  const matchLabel = (match?: typeof directMatches[number]) => match ? `${players[match.homeScore! > match.awayScore! ? match.home : match.away].name} by ${number(match.margin)} (GW ${match.gameweek})` : "Awaiting a win";
 
   return [
-    { label: "Biggest H2H win", value: matchLabel(wins[0]), detail: wins[0] ? `GW ${wins[0].gameweek}` : "Direct matchups only" },
-    { label: "Narrowest H2H win", value: matchLabel(wins.at(-1)), detail: wins.at(-1) ? `GW ${wins.at(-1)!.gameweek}` : "Direct matchups only" },
-    { label: "Best H2H record", value: bestRecord ? players[bestRecord[0]].name : "Not available", detail: bestRecord ? `${bestRecord[1].won}W ${bestRecord[1].drawn}D ${bestRecord[1].lost}L` : "Awaiting results" },
-    { label: "Closest rivalry", value: balanced ? `${players[balanced.players[0]].name} vs ${players[balanced.players[1]].name}` : "Not available", detail: balanced ? `${balanced.wins[0]}-${balanced.wins[1]} with ${balanced.draws} draws` : "Awaiting results" },
-    { label: "Highest weekly score", value: highest ? `${players[highest.player].name} - ${number(highest.score)}` : "Not available", detail: highest ? `GW ${highest.gameweek}` : "Awaiting results" },
-    { label: "Most consistent", value: consistent && completedWeeks.length > 1 ? players[consistent.player].name : "Not available", detail: consistent && completedWeeks.length > 1 ? `${number(consistent.deviation)} score deviation` : "Needs two gameweeks" },
+    { label: "Biggest H2H win", entries: wins.slice(0, 3).map(matchLabel), empty: "Direct matchups only" },
+    { label: "Narrowest H2H win", entries: [...wins].reverse().slice(0, 3).map(matchLabel), empty: "Direct matchups only" },
+    { label: "Best H2H record", entries: rankedRecords.slice(0, 3).map(([player, record]) => `${players[player].name} - ${record.won}W ${record.drawn}D ${record.lost}L`), empty: "Awaiting results" },
+    { label: "Closest rivalry", entries: rankedRivalries.slice(0, 3).map((rivalry) => `${players[rivalry.players[0]].name} vs ${players[rivalry.players[1]].name} - ${rivalry.wins[0]}-${rivalry.wins[1]}${rivalry.draws ? `, ${rivalry.draws}D` : ""}`), empty: "Awaiting results" },
+    { label: "Highest weekly score", entries: highestScores.slice(0, 3).map((score) => `${players[score.player].name} - ${number(score.score)} (GW ${score.gameweek})`), empty: "Awaiting results" },
+    { label: "Most consistent", entries: completedWeeks.length > 1 ? consistency.slice(0, 3).map((item) => `${players[item.player].name} - ${number(item.deviation)} deviation`) : [], empty: "Needs two gameweeks" },
   ];
 }
 
@@ -136,7 +136,7 @@ function App() {
 
         <section className="records-section" aria-label="Season records">
           <div className="records-heading"><p className="eyebrow">Across the league</p><h2>Season records</h2></div>
-          <div className="records-grid">{seasonRecords.map((record) => <article className="record" key={record.label}><span>{record.label}</span><strong>{record.value}</strong><small>{record.detail}</small></article>)}</div>
+          <div className="records-grid">{seasonRecords.map((record) => <article className="record" key={record.label}><span>{record.label}</span>{record.entries.length ? <ol>{record.entries.map((entry, index) => <li className={index === 0 ? "record-winner" : ""} key={entry}><b>{entry}</b></li>)}</ol> : <small>{record.empty}</small>}</article>)}</div>
         </section>
 
         {selectedPlayer && selectedStanding && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
