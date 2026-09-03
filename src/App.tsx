@@ -5,7 +5,7 @@ import { players } from "./data/players";
 import waiverBudget from "./data/waiverBudget.json";
 import { results } from "./data/results";
 import { buildStandings, getGameweekMatches, median } from "./lib/standings";
-import { playerIds, type MatchResult, type OpponentId } from "./types";
+import { playerIds, type MatchResult, type OpponentId, type PlayerId } from "./types";
 
 const number = (value?: number) => value === undefined ? "-" : Number.isInteger(value) ? value : value.toFixed(2);
 const name = (id: OpponentId) => id === "average" ? "League Average" : players[id].name;
@@ -19,6 +19,7 @@ function App() {
     timeZone: "Asia/Kolkata",
   }).format(new Date(__BUILD_TIME__));
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerId>();
   const standings = useMemo(() => buildStandings(results), []);
   const selectedResult = results.find((result) => result.gameweek === selectedWeek);
   const selectedFixture = fixtures.find((fixture) => fixture.gameweek === selectedWeek)!;
@@ -27,6 +28,18 @@ function App() {
     : selectedFixture.matches.map((match) => ({ ...match }));
   const weekScores = selectedResult ? playerIds.map((id) => selectedResult.scores[id]).filter((x): x is number => x !== undefined) : [];
   const weekMedian = weekScores.length === 5 ? median(weekScores) : undefined;
+  const selectedStanding = selectedPlayer ? standings.find((row) => row.player === selectedPlayer) : undefined;
+  const playerJourney = selectedPlayer ? results.flatMap((result) => {
+    const score = result.scores[selectedPlayer];
+    const matches = getGameweekMatches(result);
+    const match = matches.find((item) => item.home === selectedPlayer || item.away === selectedPlayer);
+    if (score === undefined || !match || match.homeScore === undefined || match.awayScore === undefined || match.homePoints === undefined) return [];
+    const points = match.home === selectedPlayer ? match.homePoints : match.awayPoints;
+    const opponent = match.home === selectedPlayer ? match.away : match.home;
+    const allScores = playerIds.map((id) => result.scores[id]);
+    const weeklyMedian = allScores.every((value) => value !== undefined) ? median(allScores as number[]) : undefined;
+    return [{ gameweek: result.gameweek, score, opponent, opponentScore: match.home === selectedPlayer ? match.awayScore : match.homeScore, result: points === 3 ? "W" : points === 1 ? "D" : "L", points, bonus: weeklyMedian !== undefined && score > weeklyMedian ? 1 : 0 }];
+  }) : [];
 
   return (
     <div className="app-shell">
@@ -56,7 +69,7 @@ function App() {
                   const diff = row.pointsFor - row.pointsAgainst;
                   return <tr key={row.player}>
                     <td><span className="position">{index + 1}</span></td>
-                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><span className="manager-name"><strong tabIndex={0}>{players[row.player].name}</strong><span className="tooltip manager-tooltip">Waiver budget spent: {number(waiverBudget[row.player])}</span></span></div></td>
+                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><span className="manager-name"><button className="manager-link" onClick={() => setSelectedPlayer(row.player)}>{players[row.player].name}</button><span className="tooltip manager-tooltip">Waiver budget spent: {number(waiverBudget[row.player])}</span></span></div></td>
                     <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
                     <td>{number(row.pointsFor)}</td><td>{number(row.pointsAgainst)}</td>
                     <td className={diff > 0 ? "positive" : diff < 0 ? "negative" : ""}>{diff > 0 ? "+" : ""}{number(diff)}</td>
@@ -69,6 +82,12 @@ function App() {
           </div>
           <div className="table-key"><span>Pts = H2H points + median bonus</span></div>
         </section>
+
+        {selectedPlayer && selectedStanding && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
+          <div className="section-title-row"><div><p className="eyebrow">Manager journey</p><h2>{players[selectedPlayer].name}</h2></div><button className="back-button" onClick={() => setSelectedPlayer(undefined)}>Close</button></div>
+          <div className="journey-summary"><span><strong>{selectedStanding.totalPoints}</strong> points</span><span>{selectedStanding.won}W {selectedStanding.drawn}D {selectedStanding.lost}L</span><span>{number(selectedStanding.pointsFor)} scored</span><span>Waiver spent: {number(waiverBudget[selectedPlayer])}</span></div>
+          <div className="table-section"><div className="table-scroll"><table className="journey-table"><thead><tr><th>GW</th><th>Score</th><th>Opponent</th><th>Against</th><th>Result</th><th>Pts</th><th>Bonus</th></tr></thead><tbody>{playerJourney.map((week) => <tr key={week.gameweek}><td>{week.gameweek}</td><td><strong>{number(week.score)}</strong></td><td>{name(week.opponent)}</td><td>{number(week.opponentScore)}</td><td><span className={`journey-result result-${week.result}`}>{week.result}</span></td><td>{week.points}</td><td>{week.bonus ? "+1" : "-"}</td></tr>)}</tbody></table></div></div>
+        </section>}
 
         <section className="gameweek-section">
           <div className="section-title-row">

@@ -33,6 +33,7 @@ tbody tr { position: relative; }
 .manager strong { color: #1c2923; font-size: 14px; }
 .manager-name { position: relative; display: inline-flex; align-items: center; }
 .manager-name strong { cursor: help; }
+.manager-link { border: 0; padding: 0; background: none; color: #1c2923; font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; text-decoration-color: #c7d4ca; text-underline-offset: 3px; }
 .manager-tooltip { bottom: calc(100% + 9px); left: 0; transform: none; width: max-content; max-width: 210px; padding: 9px 10px; font-size: 11px; }
 .manager-name:hover .manager-tooltip, .manager-name:focus-within .manager-tooltip { opacity: 1; }
 .avatar { width: 33px; height: 33px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800; color: white; background: #28664d; }
@@ -48,6 +49,12 @@ tbody tr { position: relative; }
 .table-key { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 9px 16px; border-top: 1px solid #e2e6e1; color: #7a847f; font-size: 11px; }
 .table-key span { display: flex; align-items: center; gap: 7px; }
 .gameweek-section { margin-top: 58px; }
+.journey-section { margin-top: 58px; }
+.back-button { border: 1px solid #cfd5cf; border-radius: 5px; background: white; color: #26342d; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.journey-summary { display: flex; flex-wrap: wrap; gap: 24px; margin: 0 0 14px; color: #68736d; font-size: 12px; }
+.journey-summary strong { color: #10231b; font-family: Manrope, sans-serif; font-size: 20px; }
+.journey-result { display: inline-grid; place-items: center; width: 21px; height: 21px; border-radius: 3px; color: white; font-size: 9px; font-weight: 800; }
+.result-W { background: #288459; }.result-D { background: #89928d; }.result-L { background: #c85454; }
 .section-title-row { margin-bottom: 22px; }
 .week-nav { display: flex; height: 38px; }
 .week-nav button, .week-nav select { border: 1px solid #cfd5cf; background: white; color: #26342d; }
