@@ -10,6 +10,7 @@ A static fantasy league leaderboard for Divyansh, Ishaan, Avneesh, Akshat, and V
 - Cloudflare Workers static-assets deployment configured through `wrangler.jsonc`.
 - All 38 gameweeks are prefilled in `src/data/results.json` and are waiting for real results.
 - The footer automatically displays the latest deployment time in IST.
+- Waiver budget spent is shown by hovering or focusing a manager name; values are maintained in `src/data/waiverBudget.json`.
 
 ## League rules
 

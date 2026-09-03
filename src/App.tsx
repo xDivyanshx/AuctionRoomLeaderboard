@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, CircleHelp, Trophy } from "lucide-react";
 import { fixtures } from "./data/fixtures";
 import { players } from "./data/players";
+import waiverBudget from "./data/waiverBudget.json";
 import { results } from "./data/results";
 import { buildStandings, getGameweekMatches, median } from "./lib/standings";
 import { playerIds, type MatchResult, type OpponentId } from "./types";
@@ -55,7 +56,7 @@ function App() {
                   const diff = row.pointsFor - row.pointsAgainst;
                   return <tr key={row.player}>
                     <td><span className="position">{index + 1}</span></td>
-                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><strong>{players[row.player].name}</strong></div></td>
+                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><span className="manager-name"><strong tabIndex={0}>{players[row.player].name}</strong><span className="tooltip manager-tooltip">Waiver budget spent: {number(waiverBudget[row.player])}</span></span></div></td>
                     <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
                     <td>{number(row.pointsFor)}</td><td>{number(row.pointsAgainst)}</td>
                     <td className={diff > 0 ? "positive" : diff < 0 ? "negative" : ""}>{diff > 0 ? "+" : ""}{number(diff)}</td>

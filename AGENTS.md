@@ -12,6 +12,7 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 - `src/data/results.json` contains all 38 gameweeks prefilled with `null` scores.
 - Cloudflare deployment is configured in `wrangler.jsonc`.
 - The footer timestamp is injected at build time through `__BUILD_TIME__` in `vite.config.ts` and displayed in IST.
+- Manager names expose waiver budget spent on hover/focus, sourced from `src/data/waiverBudget.json`.
 
 ## Competition rules
 
@@ -45,4 +46,4 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 
 ## Next action
 
-Wait for the owner to provide the five real GW1 fantasy scores. Replace the five GW1 `null` values in `src/data/results.json`, verify the calculated match results and median bonuses, build, update milestone notes, and stage the changes for owner review.
+Wait for the owner to provide the five real GW1 fantasy scores and current waiver-budget values. Replace the relevant values in `src/data/results.json` and `src/data/waiverBudget.json`, verify the calculated match results and median bonuses, build, update milestone notes, and stage the changes for owner review.
