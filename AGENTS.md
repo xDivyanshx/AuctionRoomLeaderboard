@@ -13,6 +13,7 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 - Cloudflare deployment is configured in `wrangler.jsonc`.
 - The footer timestamp is injected at build time through `__BUILD_TIME__` in `vite.config.ts` and displayed in IST.
 - Manager names expose waiver budget spent on hover/focus, sourced from `src/data/waiverBudget.json`.
+- The homepage includes automatically derived league-wide season records from completed gameweeks.
 
 ## Competition rules
 

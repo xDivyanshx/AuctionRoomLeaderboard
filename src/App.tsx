@@ -10,6 +10,56 @@ import { playerIds, type MatchResult, type OpponentId, type PlayerId } from "./t
 const number = (value?: number) => value === undefined ? "-" : Number.isInteger(value) ? value : value.toFixed(2);
 const name = (id: OpponentId) => id === "average" ? "League Average" : players[id].name;
 
+function getSeasonRecords(completedWeeks: typeof results) {
+  const directMatches = completedWeeks.flatMap((result) => getGameweekMatches(result)
+    .filter((match) => match.away !== "average" && match.homeScore !== undefined && match.awayScore !== undefined)
+    .map((match) => ({ ...match, gameweek: result.gameweek, away: match.away as PlayerId, margin: Math.abs(match.homeScore! - match.awayScore!) })));
+  const wins = directMatches.filter((match) => match.margin > 0).sort((a, b) => b.margin - a.margin);
+  const records = new Map<PlayerId, { won: number; drawn: number; lost: number }>(playerIds.map((id) => [id, { won: 0, drawn: 0, lost: 0 }]));
+  const rivalries = new Map<string, { players: [PlayerId, PlayerId]; wins: [number, number]; draws: number; margin: number }>();
+
+  directMatches.forEach((match) => {
+    const home = records.get(match.home)!;
+    const away = records.get(match.away)!;
+    if (match.homeScore! > match.awayScore!) { home.won += 1; away.lost += 1; }
+    else if (match.homeScore! < match.awayScore!) { away.won += 1; home.lost += 1; }
+    else { home.drawn += 1; away.drawn += 1; }
+
+    const pair = [match.home, match.away].sort() as [PlayerId, PlayerId];
+    const key = pair.join(":");
+    const rivalry = rivalries.get(key) ?? { players: pair, wins: [0, 0] as [number, number], draws: 0, margin: 0 };
+    if (match.homeScore === match.awayScore) rivalry.draws += 1;
+    else rivalry.wins[match.homeScore! > match.awayScore! ? pair.indexOf(match.home) : pair.indexOf(match.away)] += 1;
+    rivalry.margin += match.margin;
+    rivalries.set(key, rivalry);
+  });
+
+  const bestRecord = [...records.entries()].filter(([, record]) => record.won + record.drawn + record.lost > 0).sort((a, b) => {
+    const aPlayed = a[1].won + a[1].drawn + a[1].lost;
+    const bPlayed = b[1].won + b[1].drawn + b[1].lost;
+    return (b[1].won * 3 + b[1].drawn) / bPlayed - (a[1].won * 3 + a[1].drawn) / aPlayed || b[1].won - a[1].won;
+  })[0];
+  const balanced = [...rivalries.values()].sort((a, b) => Math.abs(a.wins[0] - a.wins[1]) - Math.abs(b.wins[0] - b.wins[1]) || a.margin - b.margin)[0];
+  const weeklyScores = completedWeeks.flatMap((result) => playerIds.map((player) => ({ player, gameweek: result.gameweek, score: result.scores[player]! })));
+  const highest = [...weeklyScores].sort((a, b) => b.score - a.score)[0];
+  const consistent = playerIds.map((player) => {
+    const scores = completedWeeks.map((week) => week.scores[player]!);
+    const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+    const deviation = Math.sqrt(scores.reduce((sum, score) => sum + (score - average) ** 2, 0) / scores.length);
+    return { player, deviation };
+  }).sort((a, b) => a.deviation - b.deviation)[0];
+  const matchLabel = (match?: typeof directMatches[number]) => match ? `${players[match.homeScore! > match.awayScore! ? match.home : match.away].name} by ${number(match.margin)}` : "Awaiting a win";
+
+  return [
+    { label: "Biggest H2H win", value: matchLabel(wins[0]), detail: wins[0] ? `GW ${wins[0].gameweek}` : "Direct matchups only" },
+    { label: "Narrowest H2H win", value: matchLabel(wins.at(-1)), detail: wins.at(-1) ? `GW ${wins.at(-1)!.gameweek}` : "Direct matchups only" },
+    { label: "Best H2H record", value: bestRecord ? players[bestRecord[0]].name : "Not available", detail: bestRecord ? `${bestRecord[1].won}W ${bestRecord[1].drawn}D ${bestRecord[1].lost}L` : "Awaiting results" },
+    { label: "Closest rivalry", value: balanced ? `${players[balanced.players[0]].name} vs ${players[balanced.players[1]].name}` : "Not available", detail: balanced ? `${balanced.wins[0]}-${balanced.wins[1]} with ${balanced.draws} draws` : "Awaiting results" },
+    { label: "Highest weekly score", value: highest ? `${players[highest.player].name} - ${number(highest.score)}` : "Not available", detail: highest ? `GW ${highest.gameweek}` : "Awaiting results" },
+    { label: "Most consistent", value: consistent && completedWeeks.length > 1 ? players[consistent.player].name : "Not available", detail: consistent && completedWeeks.length > 1 ? `${number(consistent.deviation)} score deviation` : "Needs two gameweeks" },
+  ];
+}
+
 function App() {
   const completedWeeks = results.filter((result) => playerIds.every((id) => result.scores[id] !== undefined));
   const latestWeek = completedWeeks.at(-1)?.gameweek ?? 1;
@@ -21,6 +71,7 @@ function App() {
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerId>();
   const standings = useMemo(() => buildStandings(results), []);
+  const seasonRecords = useMemo(() => getSeasonRecords(completedWeeks), [completedWeeks.length]);
   const selectedResult = results.find((result) => result.gameweek === selectedWeek);
   const selectedFixture = fixtures.find((fixture) => fixture.gameweek === selectedWeek)!;
   const matches: MatchResult[] = selectedResult
@@ -81,6 +132,11 @@ function App() {
             </table>
           </div>
           <div className="table-key"><span>Pts = H2H points + median bonus</span></div>
+        </section>
+
+        <section className="records-section" aria-label="Season records">
+          <div className="records-heading"><p className="eyebrow">Across the league</p><h2>Season records</h2></div>
+          <div className="records-grid">{seasonRecords.map((record) => <article className="record" key={record.label}><span>{record.label}</span><strong>{record.value}</strong><small>{record.detail}</small></article>)}</div>
         </section>
 
         {selectedPlayer && selectedStanding && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
