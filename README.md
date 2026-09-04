@@ -14,6 +14,7 @@ A static fantasy league leaderboard for Divyansh, Ishaan, Avneesh, Akshat, and V
 - League-wide season records are derived automatically from completed results, including H2H margins, records, rivalries, high scores, and consistency.
 - Season records are presented as top-three rankings, with the leader emphasized in each category.
 - Clicking a manager name opens a client-side manager journey with season summary and completed gameweek details.
+- Manager profiles use clean client-side URLs such as `/manager/divyansh`; they remain static SPA routes with no backend.
 - The manager detail view also shows six manager-specific records: biggest and narrowest H2H win (with opponent), H2H record, closest rivalry, highest weekly score, and scoring consistency.
 - Waiver journey history (players released/bought per week and cumulative spend) is intentionally deferred until a lower-maintenance weekly data format is chosen.
 

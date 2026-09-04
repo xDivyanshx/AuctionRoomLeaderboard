@@ -63,6 +63,8 @@ tbody tr { position: relative; }
 .manager-records span { display: block; color: #7a847f; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px; }
 .manager-records b { color: #10231b; font-size: 14px; }
 .journey-section { margin-top: 58px; }
+.manager-route > main > .league-heading, .manager-route > main > .table-section, .manager-route > main > .records-section, .manager-route > main > .gameweek-section { display: none; }
+.manager-route .journey-section { margin-top: 0; }
 .back-button { border: 1px solid #cfd5cf; border-radius: 5px; background: white; color: #26342d; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .journey-summary { display: flex; flex-wrap: wrap; gap: 24px; margin: 0 0 14px; color: #68736d; font-size: 12px; }
 .journey-summary strong { color: #10231b; font-family: Manrope, sans-serif; font-size: 20px; }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, CircleHelp, Trophy } from "lucide-react";
 import { fixtures } from "./data/fixtures";
 import { players } from "./data/players";
@@ -69,7 +69,10 @@ function App() {
     timeZone: "Asia/Kolkata",
   }).format(new Date(__BUILD_TIME__));
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerId>();
+  const routePlayer = window.location.pathname.startsWith("/manager/") ? window.location.pathname.split("/")[2] as PlayerId : undefined;
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerId | undefined>(playerIds.includes(routePlayer as PlayerId) ? routePlayer : undefined);
+  const navigate = (path: string) => { window.history.pushState({}, "", path); setSelectedPlayer(path.startsWith("/manager/") ? path.split("/")[2] as PlayerId : undefined); window.scrollTo(0, 0); };
+  useEffect(() => { const onPopState = () => { const id = window.location.pathname.split("/")[2] as PlayerId; setSelectedPlayer(playerIds.includes(id) ? id : undefined); }; window.addEventListener("popstate", onPopState); return () => window.removeEventListener("popstate", onPopState); }, []);
   const standings = useMemo(() => buildStandings(results), []);
   const seasonRecords = useMemo(() => getSeasonRecords(completedWeeks), [completedWeeks.length]);
   const selectedResult = results.find((result) => result.gameweek === selectedWeek);
@@ -103,7 +106,7 @@ function App() {
   })() : undefined;
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${selectedPlayer ? "manager-route" : "leaderboard-route"}`}>
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Auction Room home">
           <span className="brand-mark"><Trophy size={19} strokeWidth={2.4} /></span>
@@ -130,7 +133,7 @@ function App() {
                   const diff = row.pointsFor - row.pointsAgainst;
                   return <tr key={row.player}>
                     <td><span className="position">{index + 1}</span></td>
-                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><span className="manager-name"><button className="manager-link" onClick={() => setSelectedPlayer(row.player)}>{players[row.player].name}</button><span className="tooltip manager-tooltip">Waiver budget spent: {number(waiverBudget[row.player])}</span></span></div></td>
+                    <td><div className="manager"><span className={`avatar avatar-${index}`}>{players[row.player].initials}</span><span className="manager-name"><button className="manager-link" onClick={() => navigate(`/manager/${row.player}`)}>{players[row.player].name}</button><span className="tooltip manager-tooltip">Waiver budget spent: {number(waiverBudget[row.player])}</span></span></div></td>
                     <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
                     <td>{number(row.pointsFor)}</td><td>{number(row.pointsAgainst)}</td>
                     <td className={diff > 0 ? "positive" : diff < 0 ? "negative" : ""}>{diff > 0 ? "+" : ""}{number(diff)}</td>
@@ -149,8 +152,8 @@ function App() {
           <div className="records-grid">{seasonRecords.map((record) => <article className="record" key={record.label}><span>{record.label}</span>{record.entries.length ? <ol>{record.entries.map((entry, index) => <li className={index === 0 ? "record-winner" : ""} key={entry}><b>{entry}</b></li>)}</ol> : <small>{record.empty}</small>}</article>)}</div>
         </section>
 
-        {selectedPlayer && selectedStanding && managerStats && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
-          <div className="section-title-row"><div><p className="eyebrow">Manager journey</p><h2>{players[selectedPlayer].name}</h2></div><button className="back-button" onClick={() => setSelectedPlayer(undefined)}>Close</button></div>
+        {selectedPlayer && selectedStanding && managerStats && <section className="journey-section manager-page" aria-label={`${players[selectedPlayer].name} season journey`}>
+          <div className="section-title-row"><div><p className="eyebrow">Manager profile</p><h2>{players[selectedPlayer].name}</h2></div><button className="back-button" onClick={() => navigate("/")}>Back to leaderboard</button></div>
           <div className="journey-summary"><span><strong>{selectedStanding.totalPoints}</strong> points</span><span>{selectedStanding.won}W {selectedStanding.drawn}D {selectedStanding.lost}L</span><span>{number(selectedStanding.pointsFor)} scored</span><span>Waiver spent: {number(waiverBudget[selectedPlayer])}</span></div>
           <div className="manager-records"><article><span>Biggest H2H win</span><b>{managerStats.biggest ? `${number(managerStats.biggest.margin)} vs ${name(managerStats.biggest.home === selectedPlayer ? managerStats.biggest.away : managerStats.biggest.home)}` : "Awaiting a win"}</b></article><article><span>Narrowest H2H win</span><b>{managerStats.narrowest ? `${number(managerStats.narrowest.margin)} vs ${name(managerStats.narrowest.home === selectedPlayer ? managerStats.narrowest.away : managerStats.narrowest.home)}` : "Awaiting a win"}</b></article><article><span>H2H record</span><b>{managerStats.record.w}W {managerStats.record.d}D {managerStats.record.l}L</b></article><article><span>Closest rivalry</span><b>{managerStats.rivalry ? `${name(managerStats.rivalry.opponent)} ${managerStats.rivalry.wins}-${managerStats.rivalry.losses}${managerStats.rivalry.draws ? `, ${managerStats.rivalry.draws}D` : ""}` : "Awaiting results"}</b></article><article><span>Highest weekly score</span><b>{managerStats.highest === undefined ? "Awaiting results" : number(managerStats.highest)}</b></article><article><span>Consistency</span><b>{managerStats.deviation === undefined ? "Needs two gameweeks" : `${number(managerStats.deviation)} deviation`}</b></article></div>
           <div className="table-section"><div className="table-scroll"><table className="journey-table"><thead><tr><th>GW</th><th>Score</th><th>Opponent</th><th>Against</th><th>Result</th><th>Pts</th><th>Bonus</th></tr></thead><tbody>{playerJourney.map((week) => <tr key={week.gameweek}><td>{week.gameweek}</td><td><strong>{number(week.score)}</strong></td><td>{name(week.opponent)}</td><td>{number(week.opponentScore)}</td><td><span className={`journey-result result-${week.result}`}>{week.result}</span></td><td>{week.points}</td><td>{week.bonus ? "+1" : "-"}</td></tr>)}</tbody></table></div></div>
