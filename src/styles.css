@@ -58,6 +58,10 @@ tbody tr { position: relative; }
 .record ol { margin: 9px 0 0; padding-left: 22px; color: #7a847f; font-size: 11px; line-height: 1.8; }
 .record li b { color: #526059; font-weight: 600; }.record li.record-winner b { color: #10231b; font-family: Manrope, sans-serif; font-size: 16px; line-height: 1.25; }
 .record small { color: #68736d; font-size: 11px; }
+.manager-records { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+.manager-records article { padding: 13px 14px; border: 1px solid #dce1dc; border-radius: 6px; background: #fff; }
+.manager-records span { display: block; color: #7a847f; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 7px; }
+.manager-records b { color: #10231b; font-size: 14px; }
 .journey-section { margin-top: 58px; }
 .back-button { border: 1px solid #cfd5cf; border-radius: 5px; background: white; color: #26342d; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
 .journey-summary { display: flex; flex-wrap: wrap; gap: 24px; margin: 0 0 14px; color: #68736d; font-size: 12px; }
@@ -81,4 +85,6 @@ tbody tr { position: relative; }
 .median-strip p { margin: 0; color: #68736d; font-size: 12px; }
 footer { max-width: 1180px; margin: 0 auto; padding: 22px 24px; border-top: 1px solid #dce1dc; display: flex; justify-content: space-between; color: #7d8782; font-size: 11px; }
 @media (max-width: 780px) { main { padding: 37px 16px 60px; }.topbar { padding: 0 16px; }.fixtures-grid { grid-template-columns: 1fr; }.records-grid { grid-template-columns: repeat(2, 1fr); }.record:nth-child(3n) { border-right: 1px solid #e2e6e1; }.record:nth-child(2n) { border-right: 0; }.record:nth-last-child(-n + 3) { border-bottom: 1px solid #e2e6e1; }.record:nth-last-child(-n + 2) { border-bottom: 0; }.league-heading { align-items: flex-start; flex-direction: column; gap: 13px; } h1 { font-size: 32px; }.table-key { align-items: flex-start; flex-direction: column; }.section-title-row { align-items: center; }.median-strip { align-items: flex-start; flex-direction: column; gap: 5px; } footer { margin: 0 16px; padding-left: 0; padding-right: 0; } }
+@media (max-width: 780px) { .manager-records { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 440px) { .manager-records { grid-template-columns: 1fr; } }
 @media (max-width: 440px) { .season { font-size: 0; }.season .live-dot { display: block; }.brand small { display: none; }.records-grid { grid-template-columns: 1fr; }.record, .record:nth-child(2n), .record:nth-child(3n), .record:nth-last-child(-n + 2), .record:nth-last-child(-n + 3) { border-right: 0; border-bottom: 1px solid #e2e6e1; }.record:last-child { border-bottom: 0; }.section-title-row { align-items: flex-start; flex-direction: column; }.week-nav { width: 100%; }.week-nav select { flex: 1; } footer { flex-direction: column; gap: 5px; } }

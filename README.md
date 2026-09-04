@@ -12,6 +12,17 @@ A static fantasy league leaderboard for Divyansh, Ishaan, Avneesh, Akshat, and V
 - The footer automatically displays the latest deployment time in IST.
 - Waiver budget spent is shown by hovering or focusing a manager name; values are maintained in `src/data/waiverBudget.json`.
 - League-wide season records are derived automatically from completed results, including H2H margins, records, rivalries, high scores, and consistency.
+- Season records are presented as top-three rankings, with the leader emphasized in each category.
+- Clicking a manager name opens a client-side manager journey with season summary and completed gameweek details.
+- The manager detail view also shows six manager-specific records: biggest and narrowest H2H win (with opponent), H2H record, closest rivalry, highest weekly score, and scoring consistency.
+- Waiver journey history (players released/bought per week and cumulative spend) is intentionally deferred until a lower-maintenance weekly data format is chosen.
+
+## Current UI features
+
+- The standings table shows the latest five completed results as manager form.
+- Manager names can be hovered or focused to see waiver budget spent, and clicked to open their full journey.
+- Manager journeys derive weekly score, opponent, result, points, median bonus, and season totals entirely in the browser.
+- The homepage season-records section ranks the top three for biggest H2H win, narrowest H2H win, best H2H record, closest rivalry, highest weekly score, and most consistent scoring.
 
 ## League rules
 
@@ -66,3 +77,7 @@ The full 2026/27 fixture schedule is stored in `src/data/fixtures.ts`.
 ## Git workflow
 
 Coding agents may modify and stage files, but the repository owner performs all commits and pushes. Review staged changes before committing.
+
+## Next session
+
+Resume tomorrow with any requested UI refinements. Keep all stats client-derived from `results.json` and fixtures; update `waiverBudget.json` only when spending values change.

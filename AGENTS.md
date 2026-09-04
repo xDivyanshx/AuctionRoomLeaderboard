@@ -14,6 +14,8 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 - The footer timestamp is injected at build time through `__BUILD_TIME__` in `vite.config.ts` and displayed in IST.
 - Manager names expose waiver budget spent on hover/focus, sourced from `src/data/waiverBudget.json`.
 - The homepage includes automatically derived league-wide season records from completed gameweeks.
+- Season records are rendered as top-three rankings with the first entry emphasized.
+- Clicking a manager name opens a client-side journey section with summary and completed weekly details; hovering/focusing the name shows waiver budget spent.
 
 ## Competition rules
 
@@ -47,4 +49,4 @@ This repository is a frontend-only fantasy league leaderboard for five managers:
 
 ## Next action
 
-Wait for the owner to provide the five real GW1 fantasy scores and current waiver-budget values. Replace the relevant values in `src/data/results.json` and `src/data/waiverBudget.json`, verify the calculated match results and median bonuses, build, update milestone notes, and stage the changes for owner review.
+Resume tomorrow with any requested UI refinements. When new scores or waiver-budget values are provided, update `src/data/results.json` and `src/data/waiverBudget.json`, verify calculations, run `npm run build`, update milestone notes, and stage the changes for owner review.

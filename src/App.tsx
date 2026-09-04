@@ -48,7 +48,7 @@ function getSeasonRecords(completedWeeks: typeof results) {
     const deviation = Math.sqrt(scores.reduce((sum, score) => sum + (score - average) ** 2, 0) / scores.length);
     return { player, deviation };
   }).sort((a, b) => a.deviation - b.deviation);
-  const matchLabel = (match?: typeof directMatches[number]) => match ? `${players[match.homeScore! > match.awayScore! ? match.home : match.away].name} by ${number(match.margin)} (GW ${match.gameweek})` : "Awaiting a win";
+  const matchLabel = (match?: typeof directMatches[number]) => match ? `${players[match.homeScore! > match.awayScore! ? match.home : match.away].name} by ${number(match.margin)} vs ${players[match.homeScore! > match.awayScore! ? match.away : match.home].name} (GW ${match.gameweek})` : "Awaiting a win";
 
   return [
     { label: "Biggest H2H win", entries: wins.slice(0, 3).map(matchLabel), empty: "Direct matchups only" },
@@ -91,6 +91,16 @@ function App() {
     const weeklyMedian = allScores.every((value) => value !== undefined) ? median(allScores as number[]) : undefined;
     return [{ gameweek: result.gameweek, score, opponent, opponentScore: match.home === selectedPlayer ? match.awayScore : match.homeScore, result: points === 3 ? "W" : points === 1 ? "D" : "L", points, bonus: weeklyMedian !== undefined && score > weeklyMedian ? 1 : 0 }];
   }) : [];
+  const managerStats = selectedPlayer ? (() => {
+    const direct = completedWeeks.flatMap((result) => getGameweekMatches(result).filter((match) => match.away !== "average" && (match.home === selectedPlayer || match.away === selectedPlayer) && match.homeScore !== undefined && match.awayScore !== undefined).map((match) => ({ ...match, gameweek: result.gameweek, margin: Math.abs(match.homeScore! - match.awayScore!) })));
+    const wins = direct.filter((match) => (match.home === selectedPlayer ? match.homeScore! > match.awayScore! : match.awayScore! > match.homeScore!));
+    const rivalries = new Map<PlayerId, { opponent: PlayerId; wins: number; losses: number; draws: number; margin: number }>();
+    direct.forEach((match) => { const opponent = (match.home === selectedPlayer ? match.away : match.home) as PlayerId; const item = rivalries.get(opponent) ?? { opponent, wins: 0, losses: 0, draws: 0, margin: 0 }; const score = match.home === selectedPlayer ? match.homeScore! : match.awayScore!; const other = match.home === selectedPlayer ? match.awayScore! : match.homeScore!; score > other ? item.wins++ : score < other ? item.losses++ : item.draws++; item.margin += Math.abs(score - other); rivalries.set(opponent, item); });
+    const scores = completedWeeks.map((week) => week.scores[selectedPlayer]!);
+    const average = scores.reduce((sum, score) => sum + score, 0) / (scores.length || 1);
+    const deviation = scores.length > 1 ? Math.sqrt(scores.reduce((sum, score) => sum + (score - average) ** 2, 0) / scores.length) : undefined;
+    return { biggest: wins.sort((a, b) => b.margin - a.margin)[0], narrowest: [...wins].sort((a, b) => a.margin - b.margin)[0], record: direct.reduce((r, m) => { const s = m.home === selectedPlayer ? m.homeScore! : m.awayScore!; const o = m.home === selectedPlayer ? m.awayScore! : m.homeScore!; s > o ? r.w++ : s < o ? r.l++ : r.d++; return r; }, { w: 0, d: 0, l: 0 }), rivalry: [...rivalries.values()].sort((a, b) => Math.abs(a.wins - a.losses) - Math.abs(b.wins - b.losses) || a.margin - b.margin)[0], highest: scores.length ? Math.max(...scores) : undefined, deviation };
+  })() : undefined;
 
   return (
     <div className="app-shell">
@@ -139,9 +149,10 @@ function App() {
           <div className="records-grid">{seasonRecords.map((record) => <article className="record" key={record.label}><span>{record.label}</span>{record.entries.length ? <ol>{record.entries.map((entry, index) => <li className={index === 0 ? "record-winner" : ""} key={entry}><b>{entry}</b></li>)}</ol> : <small>{record.empty}</small>}</article>)}</div>
         </section>
 
-        {selectedPlayer && selectedStanding && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
+        {selectedPlayer && selectedStanding && managerStats && <section className="journey-section" aria-label={`${players[selectedPlayer].name} season journey`}>
           <div className="section-title-row"><div><p className="eyebrow">Manager journey</p><h2>{players[selectedPlayer].name}</h2></div><button className="back-button" onClick={() => setSelectedPlayer(undefined)}>Close</button></div>
           <div className="journey-summary"><span><strong>{selectedStanding.totalPoints}</strong> points</span><span>{selectedStanding.won}W {selectedStanding.drawn}D {selectedStanding.lost}L</span><span>{number(selectedStanding.pointsFor)} scored</span><span>Waiver spent: {number(waiverBudget[selectedPlayer])}</span></div>
+          <div className="manager-records"><article><span>Biggest H2H win</span><b>{managerStats.biggest ? `${number(managerStats.biggest.margin)} vs ${name(managerStats.biggest.home === selectedPlayer ? managerStats.biggest.away : managerStats.biggest.home)}` : "Awaiting a win"}</b></article><article><span>Narrowest H2H win</span><b>{managerStats.narrowest ? `${number(managerStats.narrowest.margin)} vs ${name(managerStats.narrowest.home === selectedPlayer ? managerStats.narrowest.away : managerStats.narrowest.home)}` : "Awaiting a win"}</b></article><article><span>H2H record</span><b>{managerStats.record.w}W {managerStats.record.d}D {managerStats.record.l}L</b></article><article><span>Closest rivalry</span><b>{managerStats.rivalry ? `${name(managerStats.rivalry.opponent)} ${managerStats.rivalry.wins}-${managerStats.rivalry.losses}${managerStats.rivalry.draws ? `, ${managerStats.rivalry.draws}D` : ""}` : "Awaiting results"}</b></article><article><span>Highest weekly score</span><b>{managerStats.highest === undefined ? "Awaiting results" : number(managerStats.highest)}</b></article><article><span>Consistency</span><b>{managerStats.deviation === undefined ? "Needs two gameweeks" : `${number(managerStats.deviation)} deviation`}</b></article></div>
           <div className="table-section"><div className="table-scroll"><table className="journey-table"><thead><tr><th>GW</th><th>Score</th><th>Opponent</th><th>Against</th><th>Result</th><th>Pts</th><th>Bonus</th></tr></thead><tbody>{playerJourney.map((week) => <tr key={week.gameweek}><td>{week.gameweek}</td><td><strong>{number(week.score)}</strong></td><td>{name(week.opponent)}</td><td>{number(week.opponentScore)}</td><td><span className={`journey-result result-${week.result}`}>{week.result}</span></td><td>{week.points}</td><td>{week.bonus ? "+1" : "-"}</td></tr>)}</tbody></table></div></div>
         </section>}
 
